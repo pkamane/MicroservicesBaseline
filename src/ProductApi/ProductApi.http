@@ -1,0 +1,24 @@
+@ProductApi_HostAddress = http://localhost:5035
+
+GET {{ProductApi_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{ProductApi_HostAddress}}/products
+Accept: application/json
+
+###
+
+GET {{ProductApi_HostAddress}}/products/1
+Accept: application/json
+
+###
+
+POST {{ProductApi_HostAddress}}/products
+Content-Type: application/json
+
+{
+  "name": "Webcam",
+  "price": 59.99
+}

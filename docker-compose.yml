@@ -1,0 +1,14 @@
+services:
+  product-api:
+    build:
+      context: .
+      dockerfile: src/ProductApi/Dockerfile
+    ports:
+      - "8081:8080"
+
+  order-api:
+    build:
+      context: .
+      dockerfile: src/OrderApi/Dockerfile
+    ports:
+      - "8082:8080"

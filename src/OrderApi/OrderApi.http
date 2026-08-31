@@ -1,0 +1,24 @@
+@OrderApi_HostAddress = http://localhost:5190
+
+GET {{OrderApi_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{OrderApi_HostAddress}}/orders
+Accept: application/json
+
+###
+
+GET {{OrderApi_HostAddress}}/orders/1
+Accept: application/json
+
+###
+
+POST {{OrderApi_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "quantity": 2
+}
