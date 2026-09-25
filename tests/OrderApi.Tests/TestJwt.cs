@@ -22,7 +22,7 @@ public static class TestJwt
     public static string CreateToken(
         string userId = "1",
         string username = "admin",
-        string role = "Admin",
+        string? role = "Admin",
         string issuer = Issuer,
         string audience = Audience,
         string signingKey = SigningKey,
@@ -32,14 +32,19 @@ public static class TestJwt
         var expiresAt = expires ?? now.AddMinutes(60);
         var notBefore = expiresAt <= now ? expiresAt.AddMinutes(-60) : now;
 
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new("username", username)
+        };
+        if (role is not null)
+        {
+            claims.Add(new Claim("role", role));
+        }
+
         var descriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim("username", username),
-                new Claim("role", role)
-            }),
+            Subject = new ClaimsIdentity(claims),
             Issuer = issuer,
             Audience = audience,
             IssuedAt = notBefore,
