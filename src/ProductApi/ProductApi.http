@@ -1,4 +1,6 @@
 @ProductApi_HostAddress = http://localhost:5035
+# Get a token from AuthApi (POST http://localhost:5250/auth/login) and paste it here.
+@token = paste-accessToken-here
 
 GET {{ProductApi_HostAddress}}/health
 Accept: application/json
@@ -6,19 +8,27 @@ Accept: application/json
 ###
 
 GET {{ProductApi_HostAddress}}/products
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ###
 
 GET {{ProductApi_HostAddress}}/products/1
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ###
 
 POST {{ProductApi_HostAddress}}/products
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "Webcam",
   "price": 59.99
 }
+
+###
+
+GET {{ProductApi_HostAddress}}/security/me
+Authorization: Bearer {{token}}

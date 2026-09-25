@@ -1,17 +1,23 @@
+using System.Security.Claims;
 using ProductApi.Models;
+using ProductApi.Security;
 using ProductApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithJwtBearer("ProductApi");
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddHealthChecks();
+builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
@@ -23,6 +29,7 @@ app.MapGet("/products", (ProductService products, ILogger<Program> logger) =>
     logger.LogInformation("Listing products");
     return Results.Ok(products.GetAll());
 })
+.RequireAuthorization()
 .WithName("GetProducts")
 .WithOpenApi();
 
@@ -37,6 +44,7 @@ app.MapGet("/products/{id:int}", (int id, ProductService products, ILogger<Progr
 
     return Results.Ok(product);
 })
+.RequireAuthorization()
 .WithName("GetProductById")
 .WithOpenApi();
 
@@ -51,7 +59,20 @@ app.MapPost("/products", (CreateProductRequest request, ProductService products,
     logger.LogInformation("Created product {ProductId}", created.Id);
     return Results.Created($"/products/{created.Id}", created);
 })
+.RequireAuthorization()
 .WithName("CreateProduct")
+.WithOpenApi();
+
+// Demo endpoint: shows the identity ASP.NET Core built from the validated JWT.
+app.MapGet("/security/me", (ClaimsPrincipal user) => Results.Ok(new
+{
+    userId = user.FindFirstValue(AuthClaimTypes.UserId),
+    username = user.Identity?.Name,
+    role = user.FindFirstValue(AuthClaimTypes.Role)
+}))
+.RequireAuthorization()
+.WithName("SecurityMe")
+.WithTags("Security")
 .WithOpenApi();
 
 app.Run();

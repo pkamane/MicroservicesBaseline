@@ -1,23 +1,25 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
 using ProductApi.Models;
 
 namespace ProductApi.Tests;
 
-public class ProductApiTests : IClassFixture<WebApplicationFactory<Program>>
+public class ProductApiTests : IClassFixture<JwtApiFactory>
 {
     private readonly HttpClient _client;
+    private readonly HttpClient _anonymousClient;
 
-    public ProductApiTests(WebApplicationFactory<Program> factory)
+    public ProductApiTests(JwtApiFactory factory)
     {
-        _client = factory.CreateClient();
+        // Business endpoints now require a JWT; health stays anonymous.
+        _client = factory.CreateClient().WithBearer(TestJwt.CreateToken());
+        _anonymousClient = factory.CreateClient();
     }
 
     [Fact]
     public async Task Health_ReturnsOk()
     {
-        var response = await _client.GetAsync("/health");
+        var response = await _anonymousClient.GetAsync("/health");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
