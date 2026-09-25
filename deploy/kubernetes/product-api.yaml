@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-api
+  namespace: microservices-baseline
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: product-api
+  template:
+    metadata:
+      labels:
+        app: product-api
+    spec:
+      containers:
+        - name: product-api
+          image: product-api:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          #livenessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 8080
+          #readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-api
+  namespace: microservices-baseline
+spec:
+  selector:
+    app: product-api
+  ports:
+    - port: 80
+      targetPort: 8080

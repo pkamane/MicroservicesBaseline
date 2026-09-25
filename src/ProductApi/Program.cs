@@ -16,6 +16,7 @@ app.UseSwaggerUI();
 app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
 app.MapHealthChecks("/health");
+app.MapGet("/version", () => Environment.GetEnvironmentVariable("APP_VERSION") ?? "v1");
 
 app.MapGet("/products", (ProductService products, ILogger<Program> logger) =>
 {

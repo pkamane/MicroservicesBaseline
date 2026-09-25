@@ -18,8 +18,9 @@ The repository name is the delivery architecture. The solution and namespaces ar
 - Health endpoint at `/health` (Kubernetes probes later)
 - xUnit tests
 - Dockerfiles and `docker-compose.yml`
+- Kubernetes manifests under `deploy/kubernetes` (local cluster)
 
-Kubernetes, Helm, GitHub Actions, Octopus, and EKS are not in this phase yet.
+Helm, GitHub Actions, Octopus, and EKS are not in this phase yet.
 
 ## Layout
 
@@ -30,6 +31,7 @@ src/OrderApi
 tests/ProductApi.Tests
 tests/OrderApi.Tests
 docs/workload-spec.md
+deploy/kubernetes
 ```
 
 ## APIs
@@ -63,6 +65,30 @@ docker compose up --build
 - Product API: http://localhost:8081/swagger
 - Order API: http://localhost:8082/swagger
 - Health: http://localhost:8081/health and http://localhost:8082/health
+
+Compose and local Kubernetes share these image tags: `product-api:local` and `order-api:local`.
+
+## Run on local Kubernetes
+
+1. Enable Kubernetes in Docker Desktop (Settings → Kubernetes → Enable), wait until it is green.
+2. Confirm the cluster: `kubectl get nodes`
+3. Build local images (if you have not already): `docker compose build`
+4. Apply manifests:
+
+```bash
+kubectl apply -f deploy/kubernetes
+```
+
+5. Forward ports (two terminals):
+
+```bash
+kubectl port-forward -n microservices-baseline svc/product-api 8081:80
+kubectl port-forward -n microservices-baseline svc/order-api 8082:80
+```
+
+Then use the same URLs as Compose: http://localhost:8081/swagger and http://localhost:8082/swagger
+
+`imagePullPolicy: Never` means Kubernetes uses images already on your machine. It will not pull from Docker Hub yet.
 
 ## Delivery sequence
 
