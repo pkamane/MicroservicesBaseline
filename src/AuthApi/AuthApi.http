@@ -1,0 +1,31 @@
+@AuthApi_HostAddress = http://localhost:5250
+
+# @name login
+POST {{AuthApi_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password"
+}
+
+###
+
+GET {{AuthApi_HostAddress}}/auth/me
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+###
+
+# Wrong password -> 401
+POST {{AuthApi_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrong"
+}
+
+###
+
+# No token -> 401
+GET {{AuthApi_HostAddress}}/auth/me
